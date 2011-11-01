@@ -2,7 +2,6 @@ PATH
   remote: .
   specs:
     frontmatter (0.0.1)
-      psych
 
 GEM
   remote: http://rubygems.org/
@@ -18,7 +17,6 @@ GEM
     gherkin (2.6.2)
       json (>= 1.4.6)
     json (1.6.1)
-    psych (1.2.2)
     term-ansicolor (1.0.7)
 
 PLATFORMS

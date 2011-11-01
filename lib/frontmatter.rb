@@ -59,6 +59,16 @@ module FrontMatter
     text =~ REGEX ? true : false
   end
 
+  # Load a file and parse the frontmatter
+  #
+  # path_to_file
+  #
+  # Returns a hash.
+  def self.file_parse(path_to_file)
+    text = File.open(path_to_file){|f| f.read}
+    front_matter = self.parse(text)
+  end
+
   # Parse the YAML frontmatter.
   #
   # text - The String path to the frontmatter and the content.
@@ -66,18 +76,18 @@ module FrontMatter
   # Returns a hash containing the parsed frontmatter data and the content.
   def self.parse(text)
 
-    document = Hash.new 
+    front_matter = Hash.new 
 
     if text =~ REGEX 
-      document[:content] = $POSTMATCH
+      front_matter['content'] = $POSTMATCH
       begin
-        document.merge!(PARSER.load($1))
+        front_matter.merge!(PARSER.load($1))
       rescue => e
         puts "YAML Exception reading #{name}: #{e.message}"
       end
     end
 
-    document
+    front_matter
 
   end
 

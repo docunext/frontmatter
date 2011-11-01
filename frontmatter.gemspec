@@ -20,6 +20,5 @@ Gem::Specification.new do |s|
 
   # specify any dependencies here; for example:
   s.add_development_dependency "cucumber"
-  s.add_runtime_dependency "psych"
   # s.add_runtime_dependency "rest-client"
 end
