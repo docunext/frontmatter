@@ -1,8 +1,10 @@
 module FrontMatter
 
-  REGEX   = /^(---\s*\n.*?\n?)^(---\s*$\n?)/m
-  INSPECT = 13
-  PARSER  = Psych
+  REGEX    = /^(---\s*\n.*?\n?)^(---\s*$\n?)/m
+  INSPECT  = 13
+  PARSER   = Psych
+  REQUIRED = [:title, :date, :content]
+  OPTIONAL = [:author, :categories, :tags, :id, :layout, :template, :permalink, :published, :publish_path]
 
   # Quick check to discover if a file might have frontmatter in it.
   # Only checks if the first line starts with "---"
@@ -15,7 +17,7 @@ module FrontMatter
   end
 
   # A more definitive check to find if a file has frontmatter in it.
-  # Since we are reading the file, we want to be cautious with with
+  # Since we are reading the file, we want to be prudent with with
   # memory and only check LINES_TO_INSPECT
   #
   # path_to_file - the canonical path to the file
@@ -25,13 +27,36 @@ module FrontMatter
     IO.readlines(path_to_file,INSPECT).join =~ REGEX ? true : false
   end
 
+
+  # Checks a string to find if it has valid frontmatter
+  #
+  # text - string containing frontmatter
+  #
+  # Returns boolean
+  def self.has_valid_frontmatter?(text)
+    front_matter = self.parse(text)
+    self.valid_frontmatter?(front_matter)
+  end
+
+  # Checks a hash to find if it has valid frontmatter
+  #
+  # front_matter - the frontmatter hash
+  #
+  # Returns boolean
+  def self.valid_frontmatter?(front_matter)
+    allkeys = REQUIRED
+    allkeys.concat(OPTIONAL)
+    REQUIRED.each {|key| front_matter.has_key?(key) }.all? &&
+      front_matter.keys.each{|key| allkeys.include?(key) }.all?
+  end
+
   # Check if the text has front matter
   #
   # text - the string to check
   #
   # Returns boolean
   def self.has_frontmatter?(text)
-    text =~ REGEX 
+    text =~ REGEX ? true : false
   end
 
   # Parse the YAML frontmatter.
@@ -44,15 +69,12 @@ module FrontMatter
     document = Hash.new 
 
     if text =~ REGEX 
-
       document[:content] = $POSTMATCH
-
       begin
         document.merge!(PARSER.load($1))
       rescue => e
         puts "YAML Exception reading #{name}: #{e.message}"
       end
-
     end
 
     document
